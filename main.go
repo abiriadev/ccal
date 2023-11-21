@@ -49,6 +49,7 @@ func printMonth(today time.Time) {
 			fmt.Printf("%2d", d)
 			d++
 			if d > daysin {
+				fmt.Printf(strings.Repeat(" ", 3*(6-(ofs%7))))
 				break
 			}
 		}
@@ -60,7 +61,7 @@ func printMonth(today time.Time) {
 		}
 	}
 
-	fmt.Printf("\n")
+	fmt.Printf("\n%s\n", strings.Repeat(" ", 7*2+6))
 }
 
 func main() {
