@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+const WEEK = 7
+const WIDTH = WEEK*3 - 1
+
 func daysin(year int, month time.Month) int {
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC).Day()
 }
@@ -37,7 +40,7 @@ func center(text string, pad int) string {
 
 func printMonth(today time.Time) {
 	year, month, _ := today.Date()
-	fmt.Println(center(fmt.Sprintf("%s %d", month, year), 7*2+6))
+	fmt.Println(center(fmt.Sprintf("%s %d", month, year), WIDTH))
 	fmt.Println("Su Mo Tu We Th Fr Sa")
 
 	daysin, weekoffset := daysin(year, month), weekoffset(year, month)
@@ -49,19 +52,19 @@ func printMonth(today time.Time) {
 			fmt.Printf("%2d", d)
 			d++
 			if d > daysin {
-				fmt.Printf(strings.Repeat(" ", 3*(6-(ofs%7))))
+				fmt.Printf(strings.Repeat(" ", 3*((WEEK-1)-(ofs%WEEK))))
 				break
 			}
 		}
 
-		if ofs%7 == 6 {
+		if ofs%WEEK == WEEK-1 {
 			fmt.Println()
 		} else {
 			fmt.Printf(" ")
 		}
 	}
 
-	fmt.Printf("\n%s\n", strings.Repeat(" ", 7*2+6))
+	fmt.Printf("\n%s\n", strings.Repeat(" ", WIDTH))
 }
 
 func main() {
