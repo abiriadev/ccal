@@ -13,6 +13,7 @@ import (
 )
 
 const WEEK = 7
+const MAX_WEEKS = 6
 const WIDTH = WEEK*3 - 1
 
 func daysin(year int, month time.Month) int {
@@ -44,39 +45,39 @@ func center(text string, pad int) string {
 	return buf.String()
 }
 
-func printMonth(today time.Time) {
-	year, month, _ := today.Date()
-	fmt.Println(center(fmt.Sprintf("%s %d", month, year), WIDTH))
-	fmt.Println("Su Mo Tu We Th Fr Sa")
-
-	daysin, weekoffset := daysin(year, month), weekoffset(year, month)
-
+func printMonth(today time.Time, labels []Label) []string {
 	bgred := color.New(color.BgRed).SprintFunc()
 
-	for ofs, d := 0, 1; ; ofs++ {
-		if ofs < int(weekoffset) {
-			fmt.Printf("  ")
-		} else {
-			if d == today.Day() {
-				fmt.Printf("%s", bgred(fmt.Sprintf("%2d", d)))
-			} else {
-				fmt.Printf("%2d", d)
-			}
-			d++
-			if d > daysin {
-				fmt.Printf(strings.Repeat(" ", 3*((WEEK-1)-(ofs%WEEK))))
-				break
-			}
-		}
+	year, month, _ := today.Date()
 
-		if ofs%WEEK == WEEK-1 {
-			fmt.Println()
-		} else {
-			fmt.Printf(" ")
-		}
+	daysin, weekoffset := daysin(year, month), int(weekoffset(year, month))
+
+	buf := make([]string, 0, MAX_WEEKS+2)
+
+	buf = append(buf, center(fmt.Sprintf("%s %d", month, year), WIDTH))
+	buf = append(buf, "Su Mo Tu We Th Fr Sa")
+
+	grid := make([]string, WEEK*MAX_WEEKS)
+
+	for i := range grid {
+		grid[i] = "  "
 	}
 
-	fmt.Printf("\n%s\n", strings.Repeat(" ", WIDTH))
+	for d := 1; d <= daysin; d++ {
+		var c string
+		if d == today.Day() {
+			c = bgred(fmt.Sprintf("%2d", d))
+		} else {
+			c = fmt.Sprintf("%2d", d)
+		}
+		grid[weekoffset+d-1] = c
+	}
+
+	for i := 0; i < 6; i++ {
+		buf = append(buf, strings.Join(grid[i*WEEK:(i+1)*WEEK], " "))
+	}
+
+	return buf
 }
 
 // inclusive range with color
@@ -131,5 +132,7 @@ func main() {
 
 	t := time.Now()
 
-	printMonth(t)
+	calbuf := printMonth(t, labels)
+
+	fmt.Printf("%s\n", strings.Join(calbuf, "\n"))
 }
