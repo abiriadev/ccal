@@ -1,7 +1,11 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -75,7 +79,56 @@ func printMonth(today time.Time) {
 	fmt.Printf("\n%s\n", strings.Repeat(" ", WIDTH))
 }
 
+// inclusive range with color
+type Label struct {
+	start int
+	end   int
+	color string
+}
+
+var labelRegex = regexp.MustCompile(`^(\d+)-(\d+)$`)
+
+func parseLabel(arg string) (Label, error) {
+	m := labelRegex.FindStringSubmatch(arg)
+
+	if len(m) != 3 {
+		return Label{}, errors.New("invalid label format")
+	}
+
+	start, err := strconv.Atoi(m[1])
+	if err != nil {
+		return Label{}, err
+	}
+
+	end, err := strconv.Atoi(m[2])
+	if err != nil {
+		return Label{}, err
+	}
+
+	color := "red"
+
+	return Label{
+		start,
+		end,
+		color,
+	}, nil
+}
+
 func main() {
+	flag.Parse()
+
+	args := flag.Args()
+
+	labels := make([]Label, 0, len(args))
+
+	for _, arg := range args {
+		l, err := parseLabel(arg)
+		if err != nil {
+			panic(err)
+		}
+		labels = append(labels, l)
+	}
+
 	t := time.Now()
 
 	printMonth(t)
