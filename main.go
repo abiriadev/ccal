@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 const WEEK = 7
@@ -45,11 +47,17 @@ func printMonth(today time.Time) {
 
 	daysin, weekoffset := daysin(year, month), weekoffset(year, month)
 
+	bgred := color.New(color.BgRed).SprintFunc()
+
 	for ofs, d := 0, 1; ; ofs++ {
 		if ofs < int(weekoffset) {
 			fmt.Printf("  ")
 		} else {
-			fmt.Printf("%2d", d)
+			if d == today.Day() {
+				fmt.Printf("%s", bgred(fmt.Sprintf("%2d", d)))
+			} else {
+				fmt.Printf("%2d", d)
+			}
 			d++
 			if d > daysin {
 				fmt.Printf(strings.Repeat(" ", 3*((WEEK-1)-(ofs%WEEK))))
