@@ -11,7 +11,7 @@ func daysin(year int, month time.Month) int {
 }
 
 func weekoffset(year int, month time.Month) time.Weekday {
-	return time.Date(year, month, 0, 0, 0, 0, 0, time.UTC).Weekday()
+	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC).Weekday()
 }
 
 func center(text string, pad int) string {
